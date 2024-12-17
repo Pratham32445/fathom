@@ -1,23 +1,7 @@
 import puppeteer from "puppeteer";
 
-async function main(meeting: string) {
-  const browser = await puppeteer.launch({
-    headless: false,
-    args: [
-      "--disable-blink-features=AutomationControlled",
-      "--use-fake-ui-for-media-stream",
-      "--window-size=1080,720",
-      "--auto-select-desktop-capture-source=[RECORD]",
-      "--enable-usermedia-screen-capturing",
-      '--auto-select-tab-capture-source-by-title="Meet"',
-      "--allow-running-insecure-content",
-    ],
-  });
-
-  const page = await browser.newPage();
-  await page.goto(meeting);
-
-  // Wait for the "Got it" button and click it
+const joinGoogleMeetMeetings = async (meeting: string) => {
+  const page = await getDriver(meeting);
   await page.waitForSelector("button");
   await page.evaluate(() => {
     const buttons = Array.from(document.querySelectorAll("button"));
@@ -65,6 +49,26 @@ async function main(meeting: string) {
       console.log('Button with text "Ask to join" not found');
     }
   });
-}
+};
 
-main("https://meet.google.com/bzb-cpmo-fwz");
+const getDriver = async (meeting: string) => {
+  const browser = await puppeteer.launch({
+    headless: false,
+    args: [
+      "--disable-blink-features=AutomationControlled",
+      "--use-fake-ui-for-media-stream",
+      "--window-size=1080,720",
+      "--auto-select-desktop-capture-source=[RECORD]",
+      "--enable-usermedia-screen-capturing",
+      '--auto-select-tab-capture-source-by-title="Meet"',
+      "--allow-running-insecure-content",
+    ],
+  });
+
+  const page = await browser.newPage();
+  await page.goto(meeting);
+  return page;
+};
+
+
+joinGoogleMeetMeetings("https://meet.google.com/bzb-cpmo-fwz");
